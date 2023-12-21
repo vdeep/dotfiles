@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+DOTFILES=$(cd -P $(dirname "${BASH_SOURCE[0]}") && pwd)
+
+# Kitty
+KITTY_CONFIG=$HOME/.config/kitty
+if [ -L "$KITTY_CONFIG" ]; then
+    rm "$KITTY_CONFIG"
+    echo "=> $KITTY_CONFIG Deleted!"
+fi
+ln -s $DOTFILES/kitty "$KITTY_CONFIG"
+echo "=> $KITTY_CONFIG symlink created!"
+
+# Tmux
+TMUX_CONFIG=$HOME/.config/tmux
+mkdir -p $TMUX_CONFIG
+ln -sf $DOTFILES/tmux/tmux.conf "$TMUX_CONFIG/tmux.conf"
+echo "=> $TMUX_CONFIG symlink created!"
+
+# Custom scripts
+mkdir -p $HOME/.local/bin
+rm -rf $HOME/.local/bin/t
+ln -s $DOTFILES/scripts/t $HOME/.local/bin/t
+echo "=> $HOME/.local/bin/t symlink created!"
+
+# Nvim
+mkdir -p $HOME/.config/nvim/lua
+rm -rf $HOME/.config/nvim/lua/custom
+ln -s $DOTFILES/nvim/lua/custom $HOME/.config/nvim/lua/custom
+echo "=> $HOME/.config/nvim/lua/custom symlink created!"
