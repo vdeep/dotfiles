@@ -4,10 +4,6 @@ local plugins = {
     lazy = false,
   },
   {
-    "github/copilot.vim",
-    lazy = false,
-  },
-  {
     "neovim/nvim-lspconfig",
     config = function()
       require "plugins.configs.lspconfig"
@@ -23,7 +19,8 @@ local plugins = {
         "html-lsp",
         "prettier",
         "stylua",
-        "tailwindcss-language-server"
+        "tailwindcss-language-server",
+        "stimulus-language-server"
       },
     },
   },

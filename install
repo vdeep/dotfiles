@@ -2,6 +2,15 @@
 
 DOTFILES=$(cd -P $(dirname "${BASH_SOURCE[0]}") && pwd)
 
+# Alacritty
+ALACRITTY_CONFIG=$HOME/.config/alacritty
+if [ -L "$ALACRITTY_CONFIG" ]; then
+    rm "$ALACRITTY_CONFIG"
+    echo "=> $ALACRITTY_CONFIG Deleted!"
+fi
+ln -s $DOTFILES/alacritty "$ALACRITTY_CONFIG"
+echo "=> $ALACRITTY_CONFIG symlink created!"
+
 # Kitty
 KITTY_CONFIG=$HOME/.config/kitty
 if [ -L "$KITTY_CONFIG" ]; then
