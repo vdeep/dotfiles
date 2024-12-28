@@ -1,20 +1,64 @@
 #!/usr/bin/env bash
 
-# Credit to ThePrimeagen
+# adapted from: https://github.com/ThePrimeagen/.dotfiles/blob/master/bin/.local/scripts/tmux-sessionizer
 
+# Check for fzf
+if ! command -v fzf &> /dev/null; then
+    echo "Error: fzf is not installed. Please install it to use this script."
+    exit 1
+fi
+
+# Check for tmux
+if ! command -v tmux &> /dev/null; then
+    echo "Error: tmux is not installed. Please install it to use this script."
+    exit 1
+fi
+
+# Collect valid directories
+base_dirs=(~/Code/Apps ~/Code/Learning ~/Code/Others ~/Code/Projects ~/Code/Sites)
+valid_dirs=()
+for dir in "${base_dirs[@]}"; do
+    [[ -d $dir ]] && valid_dirs+=("$dir")
+done
+if [[ ${#valid_dirs[@]} -eq 0 ]]; then
+    echo "Error: No valid project directories found."
+    exit 1
+fi
+
+# Selection
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    items=`find ~/Code -maxdepth 2 -mindepth 1 -type d`
-    items+=`echo -e "\n/tmp"`
-    selected=`echo "$items" | fzf`
+    selected=$(find "${valid_dirs[@]}" -mindepth 1 -maxdepth 1 -type d | fzf)
 fi
 
-dirname=`basename $selected | sed 's/\./_/g'`
-
-tmux switch-client -t =$dirname
-if [[ $? -eq 0 ]]; then
+# Handle no selection
+if [[ -z $selected ]]; then
+    echo "No directory selected. Exiting."
     exit 0
 fi
 
-tmux new-session -c $selected -d -s $dirname && tmux switch-client -t $dirname || tmux new -c $selected -A -s $dirname
+# Prepare session name
+selected_name=$(basename "$selected" | tr . _)_$(echo "$selected" | md5sum | cut -c1-8)
+tmux_running=$(pgrep -u "$(whoami)" tmux)
+
+# Start new tmux session if no tmux is running
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+    tmux new-session -s $selected_name -c $selected
+    exit 0
+fi
+
+# Create a new session if it doesn't exist
+if ! tmux has-session -t=$selected_name 2> /dev/null; then
+    tmux new-session -ds $selected_name -c $selected
+    echo "Created a new tmux session: $selected_name"
+fi
+
+# Switch to the session if inside tmux, or attach if outside
+if [[ -n $TMUX ]]; then
+    # Inside tmux: Switch client
+    tmux switch-client -t $selected_name
+else
+    # Outside tmux: Attach to the session
+    tmux attach-session -t $selected_name
+fi
