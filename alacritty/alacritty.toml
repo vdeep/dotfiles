@@ -12,9 +12,9 @@ startup_mode = "SimpleFullscreen"
 
 [font]
 
-normal.family = "Fira Code"
-bold.family = "Fira Code"
-italic.family = "Fira Code"
-bold_italic.family = "Fira Code"
+normal.family = "JetBrainsMono Nerd Font"
+bold.family = "JetBrainsMono Nerd Font"
+italic.family = "JetBrainsMono Nerd Font"
+bold_italic.family = "JetBrainsMono Nerd Font"
 
 size = 16
